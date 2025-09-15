@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig.json",
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "commonjs",
+        // "lib": [
+        //     "ES2020",
+        //     "DOM",
+        //     "DOM.Iterable"
+        // ],
+        "skipLibCheck": true,
+        "outDir": "dist",
+        "declaration": true,
+        "strict": true,
+    },
+    "exclude": [
+        "./**/*.test.ts",
+        "main.ts",
+    ],
+    "include": [
+        "image-conv.ts"
+    ]
+}

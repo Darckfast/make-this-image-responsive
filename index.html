@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dev</title>
+</head>
+
+<body style="background-color: black; color: white;">
+    <div id="app"></div>
+    <script type="module" src="/main.ts"></script>
+
+    <form id="form">
+        <label>
+            Blur
+            <input type="number" name="blur" id="blur" step="0.01" min="0" max="1" />
+        </label>
+        <label>720
+            <input type="radio" name="size" value="720" checked />
+        </label>
+        <label>480
+            <input type="radio" name="size" value="480" />
+        </label>
+        <label>120
+            <input type="radio" name="size" value="120" />
+        </label>
+        <label>24
+            <input type="radio" name="size" value="24" />
+        </label>
+        <label>
+            Image or video
+            <input type="file" name="img" id="img" />
+        </label>
+        <label>
+            Keep aspect ratio
+            <input type="checkbox" name="ratio" />
+        </label>
+    </form>
+
+    <div class="column" id="preview"></div>
+</body>
+
+</html>
