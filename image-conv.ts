@@ -5,7 +5,7 @@ interface ImageArgs {
     format?: "png" | "jpeg" | "webp"
     quality?: number
     keepAspectRatio?: boolean
-    id?: string
+    meta?: any
     cancel?: boolean
 }
 
@@ -39,7 +39,7 @@ function consumeQueue() {
         .then(blob => {
             self.postMessage({
                 blob,
-                id: args.id,
+                meta: args.meta,
             })
         }).finally(() => {
             isProcessing = false

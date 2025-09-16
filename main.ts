@@ -5,7 +5,7 @@ const form = document.getElementById('form')!
 const previewContainer = document.getElementById('preview')!
 
 worker.onmessage = function(e) {
-    const preview = document.getElementById(e.data.id)
+    const preview = document.getElementById(e.data.meta.id)
     if (!preview) {
         return;
     }
@@ -34,7 +34,9 @@ form.onchange = () => {
     createImageBitmap(img).then(bitmap => {
         worker.postMessage({
             img: bitmap,
-            id: preview.id,
+            meta: {
+                id: preview.id,
+            },
             blur: formData.get('blur'),
             maxSize: formData.get('size'),
             keepAspectRatio: formData.get("ratio"),
