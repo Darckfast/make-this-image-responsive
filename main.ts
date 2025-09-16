@@ -23,14 +23,12 @@ form.onchange = () => {
     const formData = new FormData(form)
     worker.postMessage({ cancel: true })
 
-    previewContainer.innerHTML = ''
-
     const preview = document.createElement("img")
 
     const img = formData.get("img")
 
     preview.width = 500
-    preview.id = crypto.randomUUID()
+    preview.id = "preview-result"
     previewContainer.appendChild(preview)
 
     createImageBitmap(img).then(bitmap => {
@@ -39,6 +37,9 @@ form.onchange = () => {
             id: preview.id,
             blur: formData.get('blur'),
             maxSize: formData.get('size'),
+            keepAspectRatio: formData.get("ratio"),
+            format: formData.get('format'),
+            quality: formData.get('quality')
         });
     })
 }

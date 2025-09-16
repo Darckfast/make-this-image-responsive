@@ -14,7 +14,11 @@
     <form id="form">
         <label>
             Blur
-            <input type="number" name="blur" id="blur" step="0.01" min="0" max="1" />
+            <input type="range" name="blur" id="blur" step="0.0001" min="0" value="0" max="30" />
+        </label>
+        <label>
+            Quality
+            <input type="range" name="quality"  step="0.1" min="0" value="95" max="100" />
         </label>
         <label>720
             <input type="radio" name="size" value="720" checked />
@@ -35,6 +39,15 @@
         <label>
             Keep aspect ratio
             <input type="checkbox" name="ratio" />
+        </label>
+        <label>webp
+            <input type="radio" name="format" value="webp" checked />
+        </label>
+        <label>png
+            <input type="radio" name="format" value="png" />
+        </label>
+        <label>jpeg
+            <input type="radio" name="format" value="jpeg" />
         </label>
     </form>
 

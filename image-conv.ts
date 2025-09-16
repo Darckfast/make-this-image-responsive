@@ -1,9 +1,10 @@
 interface ImageArgs {
     img: ImageBitmap
+    maxSize: number
     blur?: number
-    maxSize?: number
     format?: "png" | "jpeg" | "webp"
     quality?: number
+    keepAspectRatio?: boolean
     id?: string
     cancel?: boolean
 }
@@ -61,40 +62,53 @@ function genPreviewImg(args: ImageArgs) {
     let oH = Number(args.img.height)
     let oW = Number(args.img.width)
 
-    let MAX_WIDTH = args.maxSize || 1000;
-    let MAX_HEIGHT = args.maxSize || 1000;
+    let MAX_WIDTH = args.maxSize;
+    let MAX_HEIGHT = args.maxSize;
 
-    // TODO: add keep aspect ratio pots
-    if (args.img.width < MAX_WIDTH) {
+    if (oW < MAX_WIDTH) {
         MAX_WIDTH = oW
     }
 
-    if (args.img.height < MAX_HEIGHT) {
+    if (oH < MAX_HEIGHT) {
         MAX_HEIGHT = oH
-    }
-
-    if (oW < oH) {
-        if (oW > MAX_WIDTH) {
-            oH = oH * (MAX_WIDTH / oW);
-            oW = MAX_WIDTH;
-        }
-    } else {
-        if (oH > MAX_HEIGHT) {
-            oW = oW * (MAX_HEIGHT / oH);
-            oH = MAX_HEIGHT;
-        }
     }
 
     const larger = MAX_WIDTH > MAX_HEIGHT ? MAX_HEIGHT : MAX_WIDTH
     canvas.width = larger
     canvas.height = larger
+
+    let x0 = 0, y0 = 0
+    if (args.keepAspectRatio) {
+        const ratio = oW / oH
+        if (oW < oH) {
+            oW = MAX_WIDTH * ratio
+            oH = MAX_HEIGHT
+        } else {
+            oW = MAX_WIDTH
+            oH = MAX_HEIGHT * ratio
+        }
+    } else {
+        if (oW < oH && oW > MAX_WIDTH) {
+            oH = oH * (MAX_WIDTH / oW);
+            oW = MAX_WIDTH;
+
+        } else if (oH > MAX_HEIGHT) {
+            oW = oW * (MAX_HEIGHT / oH);
+            oH = MAX_HEIGHT;
+        }
+
+        x0 = -(oW - canvas.width) / 2
+        y0 = -(oH - canvas.height) / 2
+    }
+
     ctx.save()
 
-    const canvasWidth = canvas.width;
-    const blurRadius = canvasWidth * (args.blur || 0);
-    ctx.filter = `blur(${blurRadius}px)`
+    if (args.blur) {
+        const blurRatio = (canvas.width / oW) * Number(args.blur || 0)
+        ctx.filter = `blur(${blurRatio}px)`
+    }
 
-    ctx.drawImage(args.img, -(oW - canvas.width) / 2, -(oH - canvas.height) / 2, oW, oH);
+    ctx.drawImage(args.img, x0, y0, oW, oH);
     ctx.restore()
 
     return canvas.convertToBlob({
