@@ -79,11 +79,12 @@ function genPreviewImg(args: ImageArgs) {
 
     let x0 = 0, y0 = 0
     if (args.keepAspectRatio) {
-        const ratio = oW / oH
         if (oW < oH) {
+            const ratio = oW / oH
             oW = MAX_WIDTH * ratio
             oH = MAX_HEIGHT
         } else {
+            const ratio = oH / oW
             oW = MAX_WIDTH
             oH = MAX_HEIGHT * ratio
         }
