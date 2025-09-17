@@ -4,6 +4,19 @@ const worker = new ImageConv()
 const form = document.getElementById('form')!
 const previewContainer = document.getElementById('preview')!
 
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const value = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+
+    return `${value} ${sizes[i]}`;
+}
+
 worker.onmessage = function(e) {
     const preview = document.getElementById(e.data.meta.id)
     if (!preview) {
@@ -17,6 +30,17 @@ worker.onmessage = function(e) {
     }
 
     preview.src = url;
+    const caption = document.getElementById('caption')
+
+    let { meta, blob: { size } } = e.data
+    caption.innerText = `o-size: ${formatBytes(meta.size)}; 
+a-size: ${formatBytes(size)}; 
+${(((size / meta.size) - 1) * 100).toFixed(2)}%; 
+took: ${Date.now() - meta.start}ms;
+quality: ${meta.quality};
+blur: ${meta.blur};
+resolution: ${meta.resolution};
+aspect: ${meta.aspect}`
 };
 
 form.onchange = () => {
@@ -36,6 +60,12 @@ form.onchange = () => {
             img: bitmap,
             meta: {
                 id: preview.id,
+                start: Date.now(),
+                size: img.size,
+                quality: formData.get('quality'),
+                blur: formData.get('blur'),
+                resolution: formData.get('size'),
+                aspect: formData.get('ratio')
             },
             blur: formData.get('blur'),
             maxSize: formData.get('size'),
