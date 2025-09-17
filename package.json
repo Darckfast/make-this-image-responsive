@@ -15,9 +15,14 @@
         "dist/image-conv.js",
         "dist/image-conv.d.ts"
     ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/darckfast/make-this-image-responsive.git"
+    },
     "license": "MIT",
+    "packageManager": "pnpm@10.14.0",
     "devDependencies": {
-        "typescript": "~5.8.3",
-        "vite": "^6.3.5"
+        "typescript": "~5.9.2",
+        "vite": "^7.1.5"
     }
 }
