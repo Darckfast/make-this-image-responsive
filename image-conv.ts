@@ -7,6 +7,13 @@ interface ImageArgs {
     keepAspectRatio?: boolean
     meta?: any
     cancel?: boolean
+    overlays?: Array<{
+        img: ImageBitmap
+        height: number
+        width: number
+        position: "top-left" | "top-right" |
+        "bottom-left" | "bottom-right" | "center"
+    }>
 }
 
 let queue: Array<ImageArgs> = []
@@ -62,8 +69,8 @@ function genPreviewImg(args: ImageArgs) {
     let oH = Number(args.img.height)
     let oW = Number(args.img.width)
 
-    let MAX_WIDTH = args.maxSize;
-    let MAX_HEIGHT = args.maxSize;
+    let MAX_WIDTH = Number(args.maxSize);
+    let MAX_HEIGHT = Number(args.maxSize);
 
     if (oW < MAX_WIDTH) {
         MAX_WIDTH = oW
@@ -73,9 +80,6 @@ function genPreviewImg(args: ImageArgs) {
         MAX_HEIGHT = oH
     }
 
-    const larger = MAX_WIDTH > MAX_HEIGHT ? MAX_HEIGHT : MAX_WIDTH
-    canvas.width = larger
-    canvas.height = larger
 
     let x0 = 0, y0 = 0
     if (args.keepAspectRatio) {
@@ -88,7 +92,13 @@ function genPreviewImg(args: ImageArgs) {
             oW = MAX_WIDTH
             oH = MAX_HEIGHT * ratio
         }
+        canvas.width = oW
+        canvas.height = oH
     } else {
+        const larger = MAX_WIDTH > MAX_HEIGHT ? MAX_HEIGHT : MAX_WIDTH
+        canvas.width = larger
+        canvas.height = larger
+
         if (oW < oH && oW > MAX_WIDTH) {
             oH = oH * (MAX_WIDTH / oW);
             oW = MAX_WIDTH;
@@ -111,6 +121,33 @@ function genPreviewImg(args: ImageArgs) {
 
     ctx.drawImage(args.img, x0, y0, oW, oH);
     ctx.restore()
+
+    if (args.overlays) {
+        for (let i = 0; i < args.overlays.length; i++) {
+            const overlay = args.overlays[i]
+
+            if (overlay.img) {
+                let ovX = 0, ovY = 0
+
+                const ovH = overlay.height * oH
+                const ovW = overlay.width * oW
+                if (overlay.position === "top-right") {
+                    ovX = oW - ovW
+                } else if (overlay.position === "bottom-left") {
+                    ovY = canvas.height - ovH
+                } else if (overlay.position === "bottom-right") {
+                    ovX = canvas.width - ovW
+                    ovY = canvas.height - ovH
+                } else if (overlay.position === "center") {
+                    ovX = canvas.width / 2 - ovW / 2
+                    ovY = canvas.height / 2 - ovH / 2
+                }
+
+                console.log(x0, y0, oW, oH, ovX, ovY, ovW, ovH)
+                ctx.drawImage(overlay.img, ovX, ovY, ovW, ovH)
+            }
+        }
+    }
 
     return canvas.convertToBlob({
         type: `image/${args.format}`,

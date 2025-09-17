@@ -20,8 +20,9 @@
         "url": "git://github.com/darckfast/make-this-image-responsive.git"
     },
     "license": "MIT",
-    "packageManager": "pnpm@10.14.0",
+    "packageManager": "pnpm@10.17.0",
     "devDependencies": {
+        "catch-this": "^0.0.6",
         "typescript": "~5.9.2",
         "vite": "^7.1.5"
     }

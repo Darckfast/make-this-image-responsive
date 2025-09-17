@@ -1,3 +1,4 @@
+import { catchThis } from 'catch-this';
 import ImageConv from './image-conv.ts?worker';
 
 const worker = new ImageConv()
@@ -43,7 +44,7 @@ resolution: ${meta.resolution};
 aspect: ${meta.aspect}`
 };
 
-form.onchange = () => {
+form.onchange = async () => {
     const formData = new FormData(form)
     worker.postMessage({ cancel: true })
 
@@ -55,24 +56,38 @@ form.onchange = () => {
     preview.id = "preview-result"
     previewContainer.appendChild(preview)
 
-    createImageBitmap(img).then(bitmap => {
-        worker.postMessage({
-            img: bitmap,
-            meta: {
-                id: preview.id,
-                start: Date.now(),
-                size: img.size,
-                quality: formData.get('quality'),
-                blur: formData.get('blur'),
-                resolution: formData.get('size'),
-                aspect: formData.get('ratio')
-            },
+
+    const { data: imgBitmap } = await catchThis.async(createImageBitmap(img))
+    const overlay = formData.get('overlay')
+    const convInput = {
+        img: imgBitmap,
+        meta: {
+            id: preview.id,
+            start: Date.now(),
+            size: img.size,
+            quality: formData.get('quality'),
             blur: formData.get('blur'),
-            maxSize: formData.get('size'),
-            keepAspectRatio: formData.get("ratio"),
-            format: formData.get('format'),
-            quality: formData.get('quality')
-        });
-    })
+            resolution: formData.get('size'),
+            aspect: formData.get('ratio')
+        },
+        blur: formData.get('blur'),
+        maxSize: formData.get('size'),
+        keepAspectRatio: formData.get("ratio"),
+        format: formData.get('format'),
+        quality: formData.get('quality')
+    }
+
+    if (overlay) {
+        const { data: imgBitmap } = await catchThis.async(createImageBitmap(overlay))
+        convInput.overlays = [{
+            img: imgBitmap,
+            height: formData.get('overlay-height'),
+            width: formData.get('overlay-width'),
+            position: formData.get("position")
+        }]
+    }
+
+    console.log(convInput)
+    worker.postMessage(convInput);
 }
 

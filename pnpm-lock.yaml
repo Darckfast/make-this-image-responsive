@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      catch-this:
+        specifier: ^0.0.6
+        version: 0.0.6
       typescript:
         specifier: ~5.9.2
         version: 5.9.2
@@ -281,6 +284,9 @@ packages:
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
+  catch-this@0.0.6:
+    resolution: {integrity: sha512-zQtoJJ1j4y+lobOWSn09yhrEemh/WSi0s4Z/dnzH12IBN4u+pi6PnNuc1PNWoK+T5HzYBfwQCTNlSPNEvJOrbQ==}
+
   esbuild@0.25.9:
     resolution: {integrity: sha512-CRbODhYyQx3qp7ZEwzxOk4JBqmD/seJrzPa/cGjY1VtIn5E09Oi9/dB4JwctnfZ8Q8iT7rioVv5k/FNT/uf54g==}
     engines: {node: '>=18'}
@@ -518,6 +524,8 @@ snapshots:
     optional: true
 
   '@types/estree@1.0.8': {}
+
+  catch-this@0.0.6: {}
 
   esbuild@0.25.9:
     optionalDependencies:
