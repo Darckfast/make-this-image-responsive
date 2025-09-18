@@ -143,7 +143,6 @@ function genPreviewImg(args: ImageArgs) {
                     ovY = canvas.height / 2 - ovH / 2
                 }
 
-                console.log(x0, y0, oW, oH, ovX, ovY, ovW, ovH)
                 ctx.drawImage(overlay.img, ovX, ovY, ovW, ovH)
             }
         }
