@@ -4,17 +4,26 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     <title>dev</title>
 </head>
 
-<body style="background-color: black; color: white;">
+<body style="background-color: black; color: white; font-family: 'Poppins', sans-serif;">
     <div id="app"></div>
     <script type="module" src="/main.ts"></script>
 
-    <form id="form">
+    <form id="form" style="display: flex; justify-content: center; align-items: center; gap:1rem; flex-wrap: wrap;">
         <label>
             Blur
-            <input type="number" name="blur" id="blur" step="0.01" min="0" max="1" />
+            <input type="range" name="blur" id="blur" step="0.0001" min="0" value="0" max="30" />
+        </label>
+        <label>
+            Quality
+            <input type="range" name="quality" step="0.1" min="0" value="95" max="100" />
         </label>
         <label>720
             <input type="radio" name="size" value="720" checked />
@@ -29,16 +38,56 @@
             <input type="radio" name="size" value="24" />
         </label>
         <label>
-            Image or video
-            <input type="file" name="img" id="img" />
+            Image
+            <input type="file" name="img" id="img" accept="image/*" />
+
+            <label>webp
+                <input type="radio" name="format" value="webp" checked />
+            </label>
+            <label>png
+                <input type="radio" name="format" value="png" />
+            </label>
+            <label>jpeg
+                <input type="radio" name="format" value="jpeg" />
+            </label>
         </label>
         <label>
             Keep aspect ratio
             <input type="checkbox" name="ratio" />
         </label>
+        <label>
+            Overlay
+            <input type="file" name="overlay" />
+
+            <label>top left
+                <input type="radio" name="position" value="top-left" checked />
+            </label>
+            <label>top right
+                <input type="radio" name="position" value="top-right" />
+            </label>
+            <label>bottom left
+                <input type="radio" name="position" value="bottom-left" />
+            </label>
+            <label>bottom right
+                <input type="radio" name="position" value="bottom-right" />
+            </label>
+            <label>center
+                <input type="radio" name="position" value="center" />
+            </label>
+            <label>
+                Height
+                <input type="range" name="overlay-height" step="0.01" min="0" value="0.25" max="1" />
+            </label>
+            <label>
+                Width
+                <input type="range" name="overlay-width" step="0.01" min="0" value="0.25" max="1" />
+            </label>
+        </label>
     </form>
 
-    <div class="column" id="preview"></div>
+    <figure class="column" id="preview">
+        <figcaption id="caption"></figcaption>
+    </figure>
 </body>
 
 </html>

@@ -1,11 +1,19 @@
 interface ImageArgs {
     img: ImageBitmap
+    maxSize: number
     blur?: number
-    maxSize?: number
     format?: "png" | "jpeg" | "webp"
     quality?: number
-    id?: string
+    keepAspectRatio?: boolean
+    meta?: any
     cancel?: boolean
+    overlays?: Array<{
+        img: ImageBitmap
+        height: number
+        width: number
+        position: "top-left" | "top-right" |
+        "bottom-left" | "bottom-right" | "center"
+    }>
 }
 
 let queue: Array<ImageArgs> = []
@@ -38,7 +46,7 @@ function consumeQueue() {
         .then(blob => {
             self.postMessage({
                 blob,
-                id: args.id,
+                meta: args.meta,
             })
         }).finally(() => {
             isProcessing = false
@@ -61,41 +69,84 @@ function genPreviewImg(args: ImageArgs) {
     let oH = Number(args.img.height)
     let oW = Number(args.img.width)
 
-    let MAX_WIDTH = args.maxSize || 1000;
-    let MAX_HEIGHT = args.maxSize || 1000;
+    let MAX_WIDTH = Number(args.maxSize);
+    let MAX_HEIGHT = Number(args.maxSize);
 
-    // TODO: add keep aspect ratio pots
-    if (args.img.width < MAX_WIDTH) {
+    if (oW < MAX_WIDTH) {
         MAX_WIDTH = oW
     }
 
-    if (args.img.height < MAX_HEIGHT) {
+    if (oH < MAX_HEIGHT) {
         MAX_HEIGHT = oH
     }
 
-    if (oW < oH) {
-        if (oW > MAX_WIDTH) {
+
+    let x0 = 0, y0 = 0
+    if (args.keepAspectRatio) {
+        if (oW < oH) {
+            const ratio = oW / oH
+            oW = MAX_WIDTH * ratio
+            oH = MAX_HEIGHT
+        } else {
+            const ratio = oH / oW
+            oW = MAX_WIDTH
+            oH = MAX_HEIGHT * ratio
+        }
+        canvas.width = oW
+        canvas.height = oH
+    } else {
+        const larger = MAX_WIDTH > MAX_HEIGHT ? MAX_HEIGHT : MAX_WIDTH
+        canvas.width = larger
+        canvas.height = larger
+
+        if (oW < oH && oW > MAX_WIDTH) {
             oH = oH * (MAX_WIDTH / oW);
             oW = MAX_WIDTH;
-        }
-    } else {
-        if (oH > MAX_HEIGHT) {
+
+        } else if (oH > MAX_HEIGHT) {
             oW = oW * (MAX_HEIGHT / oH);
             oH = MAX_HEIGHT;
         }
+
+        x0 = -(oW - canvas.width) / 2
+        y0 = -(oH - canvas.height) / 2
     }
 
-    const larger = MAX_WIDTH > MAX_HEIGHT ? MAX_HEIGHT : MAX_WIDTH
-    canvas.width = larger
-    canvas.height = larger
     ctx.save()
 
-    const canvasWidth = canvas.width;
-    const blurRadius = canvasWidth * (args.blur || 0);
-    ctx.filter = `blur(${blurRadius}px)`
+    if (args.blur) {
+        const blurRatio = (canvas.width / oW) * Number(args.blur || 0)
+        ctx.filter = `blur(${blurRatio}px)`
+    }
 
-    ctx.drawImage(args.img, -(oW - canvas.width) / 2, -(oH - canvas.height) / 2, oW, oH);
+    ctx.drawImage(args.img, x0, y0, oW, oH);
     ctx.restore()
+
+    if (args.overlays) {
+        for (let i = 0; i < args.overlays.length; i++) {
+            const overlay = args.overlays[i]
+
+            if (overlay.img) {
+                let ovX = 0, ovY = 0
+
+                const ovH = overlay.height * oH
+                const ovW = overlay.width * oW
+                if (overlay.position === "top-right") {
+                    ovX = oW - ovW
+                } else if (overlay.position === "bottom-left") {
+                    ovY = canvas.height - ovH
+                } else if (overlay.position === "bottom-right") {
+                    ovX = canvas.width - ovW
+                    ovY = canvas.height - ovH
+                } else if (overlay.position === "center") {
+                    ovX = canvas.width / 2 - ovW / 2
+                    ovY = canvas.height / 2 - ovH / 2
+                }
+
+                ctx.drawImage(overlay.img, ovX, ovY, ovW, ovH)
+            }
+        }
+    }
 
     return canvas.convertToBlob({
         type: `image/${args.format}`,
